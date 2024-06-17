@@ -53,14 +53,16 @@ def randperm(n):
 
 # 初始化种群
 for i in range(POP_SIZE):
+    # 订单编码顺序
     pop[i].Position1 = randperm(N)
+    # 机器编码顺序
     if i < N1:
         pop[i].Position2 = OrderAllocate1(pop[i].Position1, M, N)
     elif N1 <= i < N1 + N2:
         pop[i].Position2 = OrderAllocate2(pop[i].Position1, M, N)
     else:
-        pop[i].Position2 = np.random.randint(0, M , size=N).tolist()
-#
+        pop[i].Position2 = np.random.randint(0, M, size=N).tolist()
+    #
     M_index, Finish_time, Cmax, Final_energy_consumption = Fitness(pop[i].Position1, pop[i].Position2, M, N)
     # 最大完成时间和总能耗数组
     pop[i].Cost = [Cmax, Final_energy_consumption]
@@ -69,6 +71,7 @@ for i in range(POP_SIZE):
     pop[i].Information['Finish_time'] = Finish_time
     pop[i].Information['Cmax'] = Cmax
     pop[i].Information['Energy_consumption'] = Final_energy_consumption
+
 
 # #  非支配排序
 # pop, F = non_dominated_sorting(pop)
@@ -127,17 +130,18 @@ def plot_gantt(M_index, Finish_time):
 if __name__ == '__main__':
     # plot_gantt(M_index, Finish_time)
     # print(M_index)
-    print("Finish_time:")
-    print(Finish_time)
+    # print("Finish_time:")
+    # print(Finish_time)
     # print("Cmax:", Cmax)
     # print("Final_energy_consumption:", Final_energy_consumption)
-    # for i in range(len(pop)):
-    #     print(pop[i].Position1, pop[i].Position2)
+    print("Preparation Time Matrix (pt):\n", pt)
+    print("Processing Time Matrix (t):\n", wt)
+    for i in range(len(pop)):
+        print(pop[i].Position1, pop[i].Position2,pop[i].Cost,pop[i].Information['Finish_time'])
 
-        # print(pop[i].Cost)
-        # print(pop[i].Information)
-        # print("Preparation Time Matrix (pt):\n", pt)
-        # print("Processing Time Matrix (t):\n", wt)
-        # print("Start/Stop Energy Consumption (Sec):\n", SSEc)
-        # print("No-load Energy Consumption Coefficient (NEcpt):\n", NEcpt)
-        # print("Energy Consumption Coefficient (WEcpt):\n", WEcpt)
+    # print(pop[i].Cost)
+    # print(pop[i].Information)
+
+    # print("Start/Stop Energy Consumption (Sec):\n", SSEc)
+    # print("No-load Energy Consumption Coefficient (NEcpt):\n", NEcpt)
+    # print("Energy Consumption Coefficient (WEcpt):\n", WEcpt)

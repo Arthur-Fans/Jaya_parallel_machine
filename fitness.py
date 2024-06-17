@@ -23,7 +23,7 @@ def Fitness(chro1, chro2, M, N):
     # 解码，获取机器加工信息
     for i in range(N):
         for j in range(M):
-            if chro2[i] == j + 1:  # MATLAB 索引从 1 开始，Python 从 0 开始
+            if chro2[i] == j:  # MATLAB 索引从 1 开始，Python 从 0 开始
                 M_index[j, k[j] - 1] = chro1[i]
                 k[j] += 1
 
@@ -33,7 +33,7 @@ def Fitness(chro1, chro2, M, N):
     for j in range(M):
         for k in range(count[j]):
             if k == 1:
-                Finish_time[j, k] = pt[M_index[j, k] - 1, j]
+                Finish_time[j, k] = wt[M_index[j, k] - 1, j]
             else:
                 Finish_time[j, k] = Finish_time[j, k - 1] + pt[M_index[j, k] - 1, M_index[j, k - 1] - 1] + wt[M_index[j, k] - 1, j]
 
@@ -43,12 +43,12 @@ def Fitness(chro1, chro2, M, N):
     for j in range(M):
         for k in range(count[j]):
             if k == 0:
-                Energy_consumption[j, k] = WEcpt[j] * pt[M_index[j, k] - 1, j]
+                Energy_consumption[j, k] = WEcpt[j] * wt[M_index[j, k] - 1, j]
             else:
                 if NEcpt[j] * pt[M_index[j, k] - 1, M_index[j, k - 1] - 1] >= SSEc[j]:
-                    Energy_consumption[j, k] = Energy_consumption[j, k - 1] + SSEc[j] + WEcpt[j] * pt[M_index[j, k] - 1, j]
+                    Energy_consumption[j, k] = Energy_consumption[j, k - 1] + SSEc[j] + WEcpt[j] * wt[M_index[j, k] - 1, j]
                 else:
-                    Energy_consumption[j, k] = Energy_consumption[j, k - 1] + NEcpt[j] * pt[M_index[j, k] - 1, M_index[j, k - 1] - 1] + WEcpt[j] * pt[M_index[j, k] - 1, j]
+                    Energy_consumption[j, k] = Energy_consumption[j, k - 1] + NEcpt[j] * pt[M_index[j, k] - 1, M_index[j, k - 1] - 1] + WEcpt[j] * wt[M_index[j, k] - 1, j]
 
     M_Energy_consumption = np.max(Energy_consumption, axis=1)
 
