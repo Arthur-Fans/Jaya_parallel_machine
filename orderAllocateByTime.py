@@ -22,20 +22,20 @@ def OrderAllocate1(chro1, M, N):
         # 计算订单在每台机器上的完工时间
         for j in range(M):
             if k[j] == 1:  # 是否是第一个
-                FinishTime[j, k[j] - 1] = wt[chro1[i], j]
-                Tc[chro1[i], j] = FinishTime[j, k[j] - 1]
+                FinishTime[j, k[j]] = wt[chro1[i] - 1, j]
+                Tc[chro1[i] - 1, j] = FinishTime[j, k[j]]
             else:
-                FinishTime[j, k[j] - 1] = FinishTime[j, k[j] - 2] + pt[chro1[i], int(Mindex[j, k[j] - 2])] + wt[
-                    chro1[i], j]  # 上一个完成时间+当前订单在前一个订单机器上的准备时间+当前订单加工时间
-                Tc[chro1[i], j] = FinishTime[j, k[j] - 1]
-            total_sum += Tc[chro1[i], j]
+                FinishTime[j, k[j]] = FinishTime[j, k[j] - 1] + pt[chro1[i] - 1, int(Mindex[j, k[j] - 1])] + wt[
+                    chro1[i] - 1, j]  # 上一个完成时间+当前订单在前一个订单机器上的准备时间+当前订单加工时间
+                Tc[chro1[i] - 1, j] = FinishTime[j, k[j]]
+            total_sum += Tc[chro1[i] - 1, j]
         # print('Tc[chro1[i], j]',Tc[chro1[i], j])
         # 计算订单选择每台机器的概率
         for l in range(M):
-            SelectionProbabilityTemp1[chro1[i], l] = Tc[chro1[i], l] / total_sum  # 计算订单在每台机台上的选择概率
+            SelectionProbabilityTemp1[chro1[i] - 1, l] = Tc[chro1[i] - 1, l] / total_sum  # 计算订单在每台机台上的选择概率
 
         # 获取当前订单chro[i]所有机器的选择概率
-        SelectionProbabilityTemp2 = SelectionProbabilityTemp1[chro1[i], :]
+        SelectionProbabilityTemp2 = SelectionProbabilityTemp1[chro1[i] - 1, :]
         # # 获取从小到大的索引值
         # sorted_indices = np.argsort(SelectionProbabilityTemp2)
         # # 创建一个新数组来存储排序后的序号
@@ -56,8 +56,8 @@ def OrderAllocate1(chro1, M, N):
             SelectionProbability[chro1[i] - 1, o] = Y[M - 1 - idx]
 
         # 选择最大完工时间最小的机器
-        Cmax_min = np.max(SelectionProbability[chro1[i], :])  # 最大完工时间最小值
-        temp = SelectionProbability[chro1[i], :]
+        Cmax_min = np.max(SelectionProbability[chro1[i] - 1, :])  # 最大完工时间最小值
+        temp = SelectionProbability[chro1[i] - 1, :]
         Machinenumber = np.where(temp == Cmax_min)[0]  # 找到满足条件的机器编号
         # print('Machinenumber', Machinenumber)
         Machinenumber = np.random.choice(Machinenumber)  # 随机选择一个机器

@@ -2,13 +2,12 @@ import numpy as np
 from scipy.io import loadmat
 
 def Fitness(chro1, chro2, M, N):
-    # 加载数据
     loaded_parameter = loadmat('parameter.mat')
     pt = loaded_parameter['pt']  # 准备时间
     wt = loaded_parameter['wt']  # 加工时间
     SSEc = loaded_parameter['SSEc']  # 启停能耗
-    NEcpt = loaded_parameter['NEcpt']
-    WEcpt = loaded_parameter['WEcpt']
+    NEcpt = loaded_parameter['NEcpt']  # 空载能耗
+    WEcpt = loaded_parameter['WEcpt']  # 加工能耗
 
     SSEc = np.squeeze(SSEc)
     NEcpt = np.squeeze(NEcpt)
@@ -32,10 +31,10 @@ def Fitness(chro1, chro2, M, N):
     count = np.sum(M_index != 0, axis=1)
     for j in range(M):
         for k in range(count[j]):
-            if k == 1:
+            if k == 0:  # 第一个订单不用准备时间
                 Finish_time[j, k] = wt[M_index[j, k] - 1, j]
             else:
-                Finish_time[j, k] = Finish_time[j, k - 1] + pt[M_index[j, k] - 1, M_index[j, k - 1] - 1] + wt[M_index[j, k] - 1, j]
+                Finish_time[j, k] = Finish_time[j, k - 1] + pt[M_index[j, k - 1] - 1, M_index[j, k] - 1] + wt[M_index[j, k] - 1, j]
 
     Cmax = np.max(Finish_time)
 
@@ -45,10 +44,10 @@ def Fitness(chro1, chro2, M, N):
             if k == 0:
                 Energy_consumption[j, k] = WEcpt[j] * wt[M_index[j, k] - 1, j]
             else:
-                if NEcpt[j] * pt[M_index[j, k] - 1, M_index[j, k - 1] - 1] >= SSEc[j]:
+                if NEcpt[j] * pt[M_index[j, k - 1] - 1, M_index[j, k] - 1] >= SSEc[j]:
                     Energy_consumption[j, k] = Energy_consumption[j, k - 1] + SSEc[j] + WEcpt[j] * wt[M_index[j, k] - 1, j]
                 else:
-                    Energy_consumption[j, k] = Energy_consumption[j, k - 1] + NEcpt[j] * pt[M_index[j, k] - 1, M_index[j, k - 1] - 1] + WEcpt[j] * wt[M_index[j, k] - 1, j]
+                    Energy_consumption[j, k] = Energy_consumption[j, k - 1] + NEcpt[j] * pt[M_index[j, k - 1] - 1, M_index[j, k] - 1] + WEcpt[j] * wt[M_index[j, k] - 1, j]
 
     M_Energy_consumption = np.max(Energy_consumption, axis=1)
 

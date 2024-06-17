@@ -2,7 +2,7 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.io import loadmat
-# from Jaya_Parallel_Machine.Jaya import non_dominated_sorting, calc_crowding_distance, sort_population
+from Jaya import non_dominated_sorting, calc_crowding_distance, sort_population
 from orderAllocateByTime import OrderAllocate1
 from orderAllocateByEnergy import OrderAllocate2
 from fitness import Fitness
@@ -48,7 +48,7 @@ pop = [Individual() for _ in range(POP_SIZE)]
 
 # 定义需要的函数
 def randperm(n):
-    return random.sample(range(n), n)
+    return random.sample(range(1, n+1), n)
 
 
 # 初始化种群
@@ -62,7 +62,7 @@ for i in range(POP_SIZE):
         pop[i].Position2 = OrderAllocate2(pop[i].Position1, M, N)
     else:
         pop[i].Position2 = np.random.randint(0, M, size=N).tolist()
-    #
+
     M_index, Finish_time, Cmax, Final_energy_consumption = Fitness(pop[i].Position1, pop[i].Position2, M, N)
     # 最大完成时间和总能耗数组
     pop[i].Cost = [Cmax, Final_energy_consumption]
@@ -73,14 +73,14 @@ for i in range(POP_SIZE):
     pop[i].Information['Energy_consumption'] = Final_energy_consumption
 
 
-# #  非支配排序
-# pop, F = non_dominated_sorting(pop)
-# #
-# #  计算拥挤度
-# pop = calc_crowding_distance(pop, F)
-# #
-# #  种群个体排序
-# pop, F = sort_population(pop)
+#  非支配排序
+pop, F = non_dominated_sorting(pop)
+#
+#  计算拥挤度
+pop = calc_crowding_distance(pop, F)
+#
+#  种群个体排序
+pop, F = sort_population(pop)
 
 # 获取最佳个体的信息
 # M_index = np.array(M_index) - 1  # 将订单编号从 1 调整为 0
@@ -130,18 +130,9 @@ def plot_gantt(M_index, Finish_time):
 if __name__ == '__main__':
     # plot_gantt(M_index, Finish_time)
     # print(M_index)
-    # print("Finish_time:")
-    # print(Finish_time)
-    # print("Cmax:", Cmax)
-    # print("Final_energy_consumption:", Final_energy_consumption)
-    print("Preparation Time Matrix (pt):\n", pt)
-    print("Processing Time Matrix (t):\n", wt)
+    # print("Finish_time:"+ Finish_time)
+    # print("Cmax:"+ Cmax)
     for i in range(len(pop)):
-        print(pop[i].Position1, pop[i].Position2,pop[i].Cost,pop[i].Information['Finish_time'])
+     #    print(pop[i].Position1, pop[i].Position2,pop[i].Cost,pop[i].Information['Finish_time'],pop[i].Information['Cmax'])
+        print(pop[i].Cost)
 
-    # print(pop[i].Cost)
-    # print(pop[i].Information)
-
-    # print("Start/Stop Energy Consumption (Sec):\n", SSEc)
-    # print("No-load Energy Consumption Coefficient (NEcpt):\n", NEcpt)
-    # print("Energy Consumption Coefficient (WEcpt):\n", WEcpt)
