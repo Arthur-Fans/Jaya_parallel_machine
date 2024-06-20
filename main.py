@@ -2,15 +2,16 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.io import loadmat
-from Jaya import non_dominated_sorting, calc_crowding_distance, sort_population
+from individual import Individual
+from Jaya import non_dominated_sorting, calc_crowding_distance, sort_population, populationEvolve
 from orderAllocateByTime import OrderAllocate1
 from orderAllocateByEnergy import OrderAllocate2
 from fitness import Fitness
 
 # 初始化种群
-N = 5  # 订单数量
+N = 10  # 订单数量
 M = 3  # 机器数量
-POP_SIZE = 12  # 种群大小
+POP_SIZE = 200  # 种群大小
 MAX_GEN = 100  # 最大迭代次数
 N1 = POP_SIZE / 4  # 以时间初始化个体数
 N2 = POP_SIZE / 2  # 以能耗初始化个体数
@@ -23,32 +24,13 @@ SSEc = loaded_parameter['SSEc']
 NEcpt = loaded_parameter['NEcpt']
 WEcpt = loaded_parameter['WEcpt']
 
-
-# 定义 Individual 类
-class Individual:
-    def __init__(self):
-        self.Position1 = []  # 订单加工序列
-        self.Position2 = []  # 机器加工序列
-        self.Cost = []
-        self.Information = {
-            'M_index': [],
-            'Finish_time': [],
-            'Cmax': [],
-            'Energy_consumption': []
-        }
-        self.Rank = []
-        self.DominationSet = []
-        self.DominatedCount = []
-        self.CrowdingDistance = []
-
-
 # 创建空的种群列表
 pop = [Individual() for _ in range(POP_SIZE)]
 
 
 # 定义需要的函数
 def randperm(n):
-    return random.sample(range(1, n+1), n)
+    return random.sample(range(1, n + 1), n)
 
 
 # 初始化种群
@@ -72,24 +54,34 @@ for i in range(POP_SIZE):
     pop[i].Information['Cmax'] = Cmax
     pop[i].Information['Energy_consumption'] = Final_energy_consumption
 
+# Jaya 算法流程
+for i in range(MAX_GEN):
+    # 非支配排序
+    pop, F = non_dominated_sorting(pop)
+    # 计算拥挤度
+    pop = calc_crowding_distance(pop, F)
+    # 种群个体排序
+    pop, F = sort_population(pop)
+    # 获取种群中最优和最差的个体
+    best = pop[0]
+    worst = pop[-1]
+    # 种群进化
+    pop = populationEvolve(pop, best, worst, POP_SIZE)
 
-#  非支配排序
+# 非支配排序
 pop, F = non_dominated_sorting(pop)
-#
-#  计算拥挤度
+# 计算拥挤度
 pop = calc_crowding_distance(pop, F)
-#
-#  种群个体排序
+# 种群个体排序
 pop, F = sort_population(pop)
 
-# 获取最佳个体的信息
+# 绘制甘特图
 # M_index = np.array(M_index) - 1  # 将订单编号从 1 调整为 0
 # Finish_time = np.array(Finish_time)
 # #
 # # # 确保 M_index 和 Finish_time 的维度正确
 # M, N = M_index.shape
 
-# 绘制甘特图
 def plot_gantt(M_index, Finish_time):
     colors = plt.cm.tab20(np.linspace(0, 1, N))  # 获取颜色映射
 
@@ -133,6 +125,5 @@ if __name__ == '__main__':
     # print("Finish_time:"+ Finish_time)
     # print("Cmax:"+ Cmax)
     for i in range(len(pop)):
-     #    print(pop[i].Position1, pop[i].Position2,pop[i].Cost,pop[i].Information['Finish_time'],pop[i].Information['Cmax'])
+        # print(pop[i].Position1, pop[i].Position2,pop[i].Cost,pop[i].Information['Finish_time'],pop[i].Information['Cmax'])
         print(pop[i].Cost)
-

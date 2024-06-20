@@ -1,5 +1,12 @@
 import numpy as np
 
+from fitness import Fitness
+from individual import Individual
+
+N = 10  # 订单数量
+M = 3  # 机器数量
+
+
 # 支配关系判断
 def dominates(x, y):
     """
@@ -8,6 +15,7 @@ def dominates(x, y):
     x = x.Cost
     y = y.Cost
     return all(x_i <= y_i for x_i, y_i in zip(x, y)) and any(x_i < y_i for x_i, y_i in zip(x, y))
+
 
 # 非支配排序
 def non_dominated_sorting(pop):
@@ -66,7 +74,8 @@ def calc_crowding_distance(pop, F):
             d[sorted_indices[0], j] = np.inf
             d[sorted_indices[-1], j] = np.inf
             for i in range(1, n - 1):
-                d[sorted_indices[i], j] = abs(costs[sorted_indices[i+1], j] - costs[sorted_indices[i-1], j]) / abs(costs[sorted_indices[-1], j] - costs[sorted_indices[0], j])
+                d[sorted_indices[i], j] = abs(costs[sorted_indices[i + 1], j] - costs[sorted_indices[i - 1], j]) / abs(
+                    costs[sorted_indices[-1], j] - costs[sorted_indices[0], j])
 
         for i in range(n):
             pop[front[i]].CrowdingDistance = np.sum(d[i, :])
@@ -89,3 +98,62 @@ def sort_population(pop):
         F[rank - 1].append(i)
 
     return pop, F
+
+
+# 种群进化
+def populationEvolve(pop, best, worst, pop_size):
+    # 创新新的初始种群
+    newPop = [Individual() for _ in range(pop_size)]
+    newPop[0] = best
+    for i in range(1, pop_size):
+        oldIndividual = pop[i]
+        # 将当前个体进行进化操作
+        newIndividual = individualEvolve(oldIndividual, best, worst)
+        # 计算进化后个体的适应度值
+        M_index, Finish_time, Cmax, Final_energy_consumption = Fitness(newIndividual.Position1,
+                                                                       newIndividual.Position2, M, N)
+        newIndividual.Cost = [Cmax, Final_energy_consumption]
+        # 种群信息
+        newIndividual.Information['M_index'] = M_index
+        newIndividual.Information['Finish_time'] = Finish_time
+        newIndividual.Information['Cmax'] = Cmax
+        newIndividual.Information['Energy_consumption'] = Final_energy_consumption
+        # 进化后优于进化前则替换为进化后的个体
+        if dominates(newIndividual, oldIndividual):
+            newPop[i] = newIndividual
+        else:
+            newPop[i] = oldIndividual
+
+    return newPop
+
+
+# 个体进化
+def individualEvolve(oldIndividual, best, worst):
+    newIndividual = oldIndividual
+    # 订单编码部分
+    index = []  # 记录要替换的位置
+    value = []  # 记录被替换的值
+    bestValue = []  # 记录替换的值
+    for i in range(len(oldIndividual.Position1)):
+        if oldIndividual.Position1[i] == worst.Position1[i]:
+            index.append(i)
+            value.append(oldIndividual.Position1[i])
+            bestValue.append(best.Position1[i])
+
+    for i in range(len(index)):
+        flag = index[i]
+        # 判断当前要替换的值和best的值是否相同，相同则不用替换，不同则替换best的值
+        if value[i] != bestValue[i]:
+            newIndividual.Position1[flag] = bestValue[i]
+            # 遍历将被替换的值插入到原先替换best的位置
+            for j in range(len(oldIndividual.Position1)):
+                if oldIndividual.Position1[j] == bestValue[i]:
+                    newIndividual.Position1[j] = value[i]
+
+    # 机器编码部分
+    for i in range(len(oldIndividual.Position2)):
+        # 如果当前个体和最劣个体机器选择编码部分编码值相同，则将最优个体相同码位上的编码复制到该码位中
+        if oldIndividual.Position2[i] == worst.Position2[i]:
+            newIndividual.Position2[i] = best.Position2[i]
+
+    return newIndividual

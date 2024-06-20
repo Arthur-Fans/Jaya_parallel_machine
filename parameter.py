@@ -2,7 +2,7 @@ import numpy as np
 from scipy.io import savemat, loadmat
 
 # 初始化变量
-N = 5  # 订单数量
+N = 10  # 订单数量
 M = 3  # 机器数量
 
 # 生成准备时间矩阵
