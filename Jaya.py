@@ -3,8 +3,8 @@ import numpy as np
 from fitness import Fitness
 from individual import Individual
 
-N = 10  # 订单数量
-M = 3  # 机器数量
+N = 40  # 订单数量
+M = 10  # 机器数量
 
 
 # 支配关系判断

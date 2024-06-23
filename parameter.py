@@ -2,18 +2,18 @@ import numpy as np
 from scipy.io import savemat, loadmat
 
 # 初始化变量
-N = 10  # 订单数量
-M = 3  # 机器数量
+N = 40  # 订单数量
+M = 10  # 机器数量
 
 # 生成准备时间矩阵
 pt = np.round(5 + (15 - 5) * np.random.rand(N, N))
 # 生成加工时间矩阵
 wt = np.round(20 + (50 - 20) * np.random.rand(N, M))
-# 生成3台机器的启停能耗数组
+# 生成M台机器的启停能耗数组
 SSEc = np.round(50 + (150 - 50) * np.random.rand(1, M))
-# 生成3台机器的空载能耗系数数组
+# 生成M台机器的空载能耗系数数组
 NEcpt = np.round(5 + (15 - 5) * np.random.rand(1, M))
-# 生成3台机器的加工能耗系数数组
+# 生成M台机器的加工能耗系数数组
 WEcpt = np.round(10 + (20 - 10) * np.random.rand(1, M))
 
 # 将准备时间矩阵的对角元素设置为零，表示同一个订单接着自己，不需要准备时间
