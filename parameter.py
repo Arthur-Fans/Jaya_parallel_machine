@@ -2,8 +2,8 @@ import numpy as np
 from scipy.io import savemat, loadmat
 
 # 初始化变量
-N = 40  # 订单数量
-M = 10  # 机器数量
+N = 5  # 订单数量
+M = 3  # 机器数量
 
 # 生成准备时间矩阵
 pt = np.round(5 + (15 - 5) * np.random.rand(N, N))

@@ -1,10 +1,12 @@
+import copy
+
 import numpy as np
 
 from fitness import Fitness
 from individual import Individual
 
-N = 40  # 订单数量
-M = 10  # 机器数量
+N = 5  # 订单数量
+M = 3  # 机器数量
 
 
 # 支配关系判断
@@ -129,26 +131,22 @@ def populationEvolve(pop, best, worst, pop_size):
 
 # 个体进化
 def individualEvolve(oldIndividual, best, worst):
-    newIndividual = oldIndividual
+    newIndividual = copy.deepcopy(oldIndividual)
     # 订单编码部分
     index = []  # 记录要替换的位置
     value = []  # 记录被替换的值
-    bestValue = []  # 记录替换的值
     for i in range(len(oldIndividual.Position1)):
         if oldIndividual.Position1[i] == worst.Position1[i]:
             index.append(i)
             value.append(oldIndividual.Position1[i])
-            bestValue.append(best.Position1[i])
 
     for i in range(len(index)):
         flag = index[i]
-        # 判断当前要替换的值和best的值是否相同，相同则不用替换，不同则替换best的值
-        if value[i] != bestValue[i]:
-            newIndividual.Position1[flag] = bestValue[i]
-            # 遍历将被替换的值插入到原先替换best的位置
-            for j in range(len(oldIndividual.Position1)):
-                if oldIndividual.Position1[j] == bestValue[i]:
-                    newIndividual.Position1[j] = value[i]
+        for j in range(len(best.Position1)):
+            if best.Position1[j] in value:
+                newIndividual.Position1[flag] = best.Position1[j]
+                value.remove(best.Position1[j])
+                break
 
     # 机器编码部分
     for i in range(len(oldIndividual.Position2)):
